@@ -1,0 +1,41 @@
+version: '2.0'
+services:
+  a1111:
+    image: 'zjuuu/a1111:1.0'
+    expose:
+      - port: 8080
+        as: 8000
+        to:
+          - global: true
+    env:
+      - "VAEURLS=https://huggingface.co/stabilityai/sdxl-vae/resolve/main/sdxl_vae.safetensors"
+      - "MODELURLS=https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors,https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors"
+      - "COMMANDLINE_ARGS=--opt-sdp-attention --listen --port 8080 --api --ckpt-dir /sdmodels/CKPT --vae-dir /sdmodels/VAE --vae-path /sdmodels/VAE/sdxl_vae.safetensors"
+      - "PYTORCH_CUDA_ALLOC_CONF=garbage_collection_threshold:0.9,max_split_size_mb:512"
+profiles:
+  compute:
+    a1111:
+      resources:
+        cpu:
+          units: 6
+        memory:
+          size: 32GB
+        storage:
+          - size: 64GB
+        gpu:
+          units: 1
+          attributes:
+            vendor:
+              nvidia:
+                - model: a100
+  placement:
+    dcloud:
+      pricing:
+        a1111:
+          denom: uakt
+          amount: 100000
+deployment:
+  a1111:
+    dcloud:
+      profile: a1111
+      count: 1

@@ -1,0 +1,39 @@
+---
+version: "2.0"
+services:
+  gpulb:
+    image: "yourimagehere"
+    expose:
+      - port: 3002
+        as: 8000
+        to:
+          - global: true
+    env:
+      - "SERVER_NAME="
+      - 'A1111_SERVERS=[{ "url": "http://example:18181", "available": true}]'
+      - "LOG_DB_HOST="
+      - "LOG_DB_PORT="
+      - "LOG_DB_NAME="
+      - "LOG_DB_USER="
+      - "LOG_DB_PASSWORD="
+profiles:
+  compute:
+    gpulb:
+      resources:
+        cpu:
+          units: 1
+        memory:
+          size: 2Gi
+        storage:
+          - size: 1Gi
+  placement:
+    dcloud:
+      pricing:
+        gpulb:
+          denom: uakt
+          amount: 1000
+deployment:
+  gpulb:
+    dcloud:
+      profile: gpulb
+      count: 1
